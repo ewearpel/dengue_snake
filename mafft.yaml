@@ -1,0 +1,21 @@
+name: mafft_env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - gawk=5.3.1=hcd3d067_0
+  - gmp=6.3.0=hac33072_2
+  - libasprintf=0.23.1=h8e693c7_0
+  - libgcc=14.2.0=h77fa898_1
+  - libgcc-ng=14.2.0=h69a702a_1
+  - libgettextpo=0.23.1=h5888daf_0
+  - libgomp=14.2.0=h77fa898_1
+  - libstdcxx=14.2.0=hc0a3c3a_1
+  - libstdcxx-ng=14.2.0=h4852527_1
+  - mafft=7.525=h031d066_1
+  - mpfr=4.2.1=h90cbb55_3
+  - ncurses=6.5=h2d0b736_3
+  - readline=8.2=h8228510_1
+prefix: /home/rennig/app/miniforge3/envs/mafft_env
