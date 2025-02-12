@@ -1,0 +1,12 @@
+name: iqtree_env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - iqtree=2.4.0=h503566f_0
+  - libgcc=14.2.0=h77fa898_1
+  - libgomp=14.2.0=h77fa898_1
+  - libstdcxx=14.2.0=hc0a3c3a_1
+prefix: /home/rennig/app/miniforge3/envs/iqtree_env
