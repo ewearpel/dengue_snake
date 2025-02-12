@@ -1,5 +1,4 @@
 samples = [
-    "NC_026433.1",
     "PP151906",
     "PP151907",
     "PP151908",
@@ -24,7 +23,7 @@ samples = [
 
 rule all:
     input:
-        "intermediate/tree/virus_aligned.treefile"
+        "intermediate/cluster/clusterPicks.fasta"
 
 
 rule download_data:
@@ -91,4 +90,24 @@ rule maximum_likelihood_tree:
         iqtree2 -s {input} --prefix "intermediate/tree/virus_aligned"
         '''
 
-
+rule genomic_cluster: ### cluster-picker: can I find a non-interactive version?
+    input:
+        aligned=rules.lower_to_upper_nucleotides.output,
+        tree=rules.maximum_likelihood_tree.output
+    output:
+        "intermediate/cluster/clusterPicks.fasta"
+    params:
+        bootstrap=95
+    conda:
+        "yaml/clusterpicker_env.yaml"
+    shell:
+        '''
+        mkdir -p intermediate/cluster
+        cluster-picker \
+            -t {input.tree} \
+            -p {input.aligned} \
+            -b {params.bootstrap} \
+            -s 0.005 \
+            -m 0.75 \
+            -o intermediate/cluster
+            '''
