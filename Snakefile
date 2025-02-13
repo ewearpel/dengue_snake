@@ -1,12 +1,13 @@
-config: "config.yaml"
+configfile: "config.yaml"
 
-accessionfile = config["accessionfile"]
-samples = [line.strip() for line in open(accessionfile)]
+accession_file = config["accessionfile"]
+prefix = config["output_prefix"]
+samples = [line.strip() for line in open(accession_file)]
 threads = config["threads"]
 
 rule all:
     input:
-        "intermediate/tree/virus_aligned.treefile"
+        "results/tree/virus_aligned.treefile"
 
 rule download_data:
     output:
@@ -18,7 +19,7 @@ rule concatenate_genomes:
     input:
         expand("data/genomes/{sample}.fasta",sample=samples)
     output:
-        "intermediate/genomes/virus_genomes.fasta"
+        "intermediate/genomes/{prefix}_genomes.fasta"
     shell:
         'cat {input} > {output}'
 
@@ -26,7 +27,7 @@ rule align_genomes:
     input:
         rules.concatenate_genomes.output
     output:
-        "intermediate/aligned/virus_aligned.fasta"
+        "intermediate/aligned/{prefix}_aligned.fasta"
     conda:
         "yaml/mafft_env.yaml"
     shell:
@@ -36,7 +37,7 @@ rule lower_to_upper_nucleotides:
     input:
         rules.align_genomes.output
     output:
-        "intermediate/aligned/virus_aligned_clean.fasta"
+        "intermediate/aligned/{prefix}_aligned_clean.fasta"
     shell:
         'cat {input} | tr [:lower:] [:upper:] > {output}'
 
@@ -45,7 +46,7 @@ rule convert_fasta_to_phy:
     input:
         rules.lower_to_upper_nucleotides.output
     output:
-        "intermediate/aligned/virus_aligned.phy"
+        "intermediate/aligned/{prefix}_aligned.phy"
     conda:
         "yaml/emboss_env.yaml"
     shell:
@@ -55,7 +56,7 @@ rule clean_phylip_file:
     input:
         rules.convert_fasta_to_phy.output
     output:
-        "intermediate/aligned/virus_aligned_clean.phy"
+        "intermediate/aligned/{prefix}_aligned_clean.phy"
     shell:
         "sed -E 's/\.[0-9]+/  /g; s/\./ /g' {input} > {output}"
 
@@ -63,16 +64,16 @@ rule maximum_likelihood_tree:
     input:
         rules.clean_phylip_file.output
     output:
-        "intermediate/tree/virus_aligned.treefile"
+        "results/tree/{prefix}_aligned.treefile"
     conda:
         "yaml/iqtree_env.yaml"
     params:
         threads=threads
     shell:
         '''
-        [ -d intermediate/tree ] && rm -rf intermediate/tree
-        mkdir -p intermediate/tree
-        iqtree2 -s {input} --prefix "intermediate/tree/virus_aligned" -nt {params.threads}
+        [ -d results/tree ] && rm -rf results/tree
+        mkdir -p results/tree
+        iqtree2 -s {input} --prefix "results/tree/{wildcards.prefix}_aligned" -nt {params.threads}
         '''
 
 

@@ -2,3 +2,5 @@ intermediate/*
 .snakemake
 .venv
 data/
+results/
+*.png
