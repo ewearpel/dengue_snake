@@ -1,7 +1,10 @@
 configfile: "config.yaml"
 
+import os
+
 accession_file = config["accessionfile"]
 prefix = config["output_prefix"]
+work = config.get("working_directory", os.getcwd())
 samples = [line.strip() for line in open(accession_file)]
 threads = config["threads"]
 
@@ -11,15 +14,15 @@ rule all:
 
 rule download_data:
     output:
-        "data/genomes/{sample}.fasta"
+        "{work}/data/genomes/{sample}.fasta"
     shell:
         ' wget -q "https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id={wildcards.sample}&db=nuccore&report=fasta&retmode=text" -O {output}'
 
 rule concatenate_genomes:
     input:
-        expand("data/genomes/{sample}.fasta",sample=samples)
+        expand("{work}/data/genomes/{sample}.fasta",sample=samples)
     output:
-        "intermediate/genomes/{prefix}_genomes.fasta"
+        "{work}/intermediate/genomes/{prefix}_genomes.fasta"
     shell:
         'cat {input} > {output}'
 
@@ -27,7 +30,7 @@ rule align_genomes:
     input:
         rules.concatenate_genomes.output
     output:
-        "intermediate/aligned/{prefix}_aligned.fasta"
+        "{work}/intermediate/aligned/{prefix}_aligned.fasta"
     conda:
         "yaml/mafft_env.yaml"
     shell:
@@ -37,7 +40,7 @@ rule lower_to_upper_nucleotides:
     input:
         rules.align_genomes.output
     output:
-        "intermediate/aligned/{prefix}_aligned_clean.fasta"
+        "{work}/intermediate/aligned/{prefix}_aligned_clean.fasta"
     shell:
         'cat {input} | tr [:lower:] [:upper:] > {output}'
 
@@ -46,7 +49,7 @@ rule convert_fasta_to_phy:
     input:
         rules.lower_to_upper_nucleotides.output
     output:
-        "intermediate/aligned/{prefix}_aligned.phy"
+        "{work}/intermediate/aligned/{prefix}_aligned.phy"
     conda:
         "yaml/emboss_env.yaml"
     shell:
@@ -56,7 +59,7 @@ rule clean_phylip_file:
     input:
         rules.convert_fasta_to_phy.output
     output:
-        "intermediate/aligned/{prefix}_aligned_clean.phy"
+        "{work}/intermediate/aligned/{prefix}_aligned_clean.phy"
     shell:
         "sed -E 's/\.[0-9]+/  /g; s/\./ /g' {input} > {output}"
 
@@ -64,16 +67,16 @@ rule maximum_likelihood_tree:
     input:
         rules.clean_phylip_file.output
     output:
-        "results/tree/{prefix}_aligned.treefile"
+        "{work}/results/tree/{prefix}_aligned.treefile"
     conda:
         "yaml/iqtree_env.yaml"
     params:
         threads=threads
     shell:
         '''
-        [ -d results/tree ] && rm -rf results/tree
-        mkdir -p results/tree
-        iqtree2 -s {input} --prefix "results/tree/{wildcards.prefix}_aligned" -nt {params.threads}
+        [ -d {wildcards.work}/results/tree ] && rm -rf {wildcards.work}/results/tree
+        mkdir -p {wildcards.work}/results/tree
+        iqtree2 -s {input} --prefix "{work}/results/tree/{prefix}_aligned" -nt {params.threads}
         '''
 
 
