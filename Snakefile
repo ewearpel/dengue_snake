@@ -11,21 +11,21 @@ rule all:
 
 rule download_data:
     output:
-        "data/genomes/{sample}.fasta"
+        "data/genes/{sample}.fasta"
     shell:
         ' wget -q "https://www.ncbi.nlm.nih.gov/sviewer/viewer.fcgi?id={wildcards.sample}&db=nuccore&report=fasta&retmode=text" -O {output}'
 
-rule concatenate_genomes:
+rule concatenate_genes:
     input:
-        expand("data/genomes/{sample}.fasta",sample=samples)
+        expand("data/genes/{sample}.fasta",sample=samples)
     output:
-        "intermediate/genomes/{prefix}_genomes.fasta"
+        "intermediate/genes/{prefix}_genes.fasta"
     shell:
         'cat {input} > {output}'
 
-rule align_genomes:
+rule align_genes:
     input:
-        rules.concatenate_genomes.output
+        rules.concatenate_genes.output
     output:
         "intermediate/aligned/{prefix}_aligned.fasta"
     conda:
@@ -35,7 +35,7 @@ rule align_genomes:
 
 rule lower_to_upper_nucleotides:
     input:
-        rules.align_genomes.output
+        rules.align_genes.output
     output:
         "intermediate/aligned/{prefix}_aligned_clean.fasta"
     shell:
