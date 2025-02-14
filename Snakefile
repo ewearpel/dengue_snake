@@ -1,5 +1,8 @@
 configfile: "config.yaml"
 
+from pathlib import Path
+
+
 accession_file = config["accessionfile"]
 prefix = config["output_prefix"]
 samples = [line.strip() for line in open(accession_file)]
