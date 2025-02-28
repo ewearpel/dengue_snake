@@ -1,11 +1,12 @@
 # dengue_snake
-
+![Rulegraph](rulegraph.png)
 ## Usage:  
 To run a test on a small subset of the input data, use the following command:
 ```bash
 snakemake -c <cores> --use-conda --configfile workflow/config.yaml
 ```
-The config.yaml file defines the path to the file containing NCBI accession IDs, an output prefix as well as the number of threads to be used by the IQTREE2 step generating a maximum likelihood phylogenetic tree.
+The `config.yaml` file defines the path to the file containing NCBI accession IDs, an output prefix as well as the number of threads to be used by the IQTREE2 step generating a maximum likelihood phylogenetic tree.  
+Additionally, required Conda environments are defined by yaml files in the `workflow/envs` subdirectory.
 
 ## Workflow:
 The workflow implements phylogenetic analysis of Dengue virus strains as outlined by Edenborough et al. (2024).  
@@ -18,3 +19,7 @@ This achieved by defining the following rules:
 - `rule convert_fasta_to_phy`: converts the FASTA file containing upper-case gene alignments to PHYLIP format using EMBOSS' seqret functionality as required by IQTREE2
 - `rule clean_phylip_file`: clean the sequence identifiers in the PHYLIP file to make it compatible with IQTREE2 using the bash `sed` command
 - `rule maximum_likelihood_tree`: generate a maximum likelihood phylogenetic tree from the cleaned PHYLIP file using IQTREE2
+
+## Reference:
+Edenborough, K., Supriyati, E., Dufault, S., Arguni, E., Indriani, C., Denton, J., Sasmono, R. T., Ahmad, R. A., Anders, K. L., & Simmons, C. P. (2024). Dengue virus genomic surveillance in the applying Wolbachia to eliminate dengue trial reveals genotypic efficacy and disruption of focal transmission. Scientific Reports, 14(1), 28004–28010. https://doi.org/10.1038/s41598-024-78008-y
+
