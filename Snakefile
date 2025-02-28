@@ -48,7 +48,7 @@ rule convert_fasta_to_phy:
     output:
         "intermediate/aligned/{prefix}_aligned.phy"
     conda:
-        "workflow/envs//emboss_env.yaml"
+        "workflow/envs/emboss_env.yaml"
     shell:
         'seqret -sequence {input} -outseq {output} -osformat2 phylip'
 
