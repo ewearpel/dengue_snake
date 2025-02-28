@@ -2,5 +2,4 @@ intermediate/*
 .snakemake
 .venv
 results/
-*.png
-.idea/
+.idea
