@@ -1,7 +1,4 @@
-configfile: "config.yaml"
-
-from pathlib import Path
-
+configfile: "workflow/config.yaml"
 
 accession_file = config["accessionfile"]
 prefix = config["output_prefix"]
@@ -32,7 +29,7 @@ rule align_genes:
     output:
         "intermediate/aligned/{prefix}_aligned.fasta"
     conda:
-        "yaml/mafft_env.yaml"
+        "workflow/envs/mafft_env.yaml"
     shell:
         'mafft --auto {input} > {output}'
 
@@ -51,7 +48,7 @@ rule convert_fasta_to_phy:
     output:
         "intermediate/aligned/{prefix}_aligned.phy"
     conda:
-        "yaml/emboss_env.yaml"
+        "workflow/envs//emboss_env.yaml"
     shell:
         'seqret -sequence {input} -outseq {output} -osformat2 phylip'
 
@@ -69,7 +66,7 @@ rule maximum_likelihood_tree:
     output:
         "results/tree/{prefix}_aligned.treefile"
     conda:
-        "yaml/iqtree_env.yaml"
+        "workflow/envs/iqtree_env.yaml"
     params:
         threads=threads
     shell:

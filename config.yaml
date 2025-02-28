@@ -1,3 +1,0 @@
-accessionfile: "accessions/accessions_test.tsv"
-output_prefix: "virus"
-threads: 6
